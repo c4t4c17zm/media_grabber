@@ -6,7 +6,7 @@ scanButton.addEventListener('click', scan);
 
 async function scan() {
   listNode.replaceChildren();
-  statusNode.textContent = 'Ищу прямые медиафайлы…';
+  statusNode.textContent = 'Ищу видео, аудио и изображения…';
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id || !/^https?:/.test(tab.url || '')) throw new Error('Открой обычную веб-страницу и попробуй снова.');
@@ -23,26 +23,42 @@ async function scan() {
 }
 
 function findMedia() {
-  const extensions = /\.(mp4|webm|mov|m4v|ogv|avi|mp3|m4a|aac|wav|ogg|flac)(?:$|[?#])/i;
+  const extensions = /\.(mp4|webm|mov|m4v|ogv|avi|mp3|m4a|aac|wav|ogg|flac|jpe?g|png|gif|webp|avif|bmp)(?:$|[?#])/i;
+  const imageExtensions = /\.(jpe?g|png|gif|webp|avif|bmp)(?:$|[?#])/i;
   const found = new Map();
-  const add = (rawUrl, label, type = '') => {
+  const add = (rawUrl, label, type = '', category = 'Медиа') => {
     if (!rawUrl) return;
     try {
       const url = new URL(rawUrl, location.href);
       if (!['http:', 'https:'].includes(url.protocol) || !extensions.test(url.href)) return;
-      if (!found.has(url.href)) found.set(url.href, { url: url.href, label, type });
+      const kind = imageExtensions.test(url.href) || category === 'Изображение' ? 'Изображение' : category;
+      if (!found.has(url.href)) found.set(url.href, { url: url.href, label, type, category: kind });
     } catch (_) {}
   };
 
   document.querySelectorAll('video, audio').forEach((media, index) => {
     const tag = media.tagName.toLowerCase();
     const sources = [media.currentSrc, media.src, ...[...media.querySelectorAll('source')].map(source => source.src)];
-    sources.forEach((url, sourceIndex) => add(url, `${tag === 'video' ? 'Видео' : 'Аудио'} ${index + 1}${sourceIndex ? ` · источник ${sourceIndex + 1}` : ''}`, media.getAttribute('type') || ''));
+    sources.forEach((url, sourceIndex) => add(url, `${tag === 'video' ? 'Видео' : 'Аудио'} ${index + 1}${sourceIndex ? ` · источник ${sourceIndex + 1}` : ''}`, media.getAttribute('type') || '', tag === 'video' ? 'Видео' : 'Аудио'));
   });
 
   document.querySelectorAll('a[href]').forEach((anchor, index) => {
     const href = anchor.href;
-    if (extensions.test(href)) add(href, anchor.innerText.trim() || `Медиафайл ${index + 1}`, anchor.type || '');
+    if (extensions.test(href)) add(href, anchor.innerText.trim() || `Файл ${index + 1}`, anchor.type || '');
+  });
+
+  // Pinterest pins and many galleries render their media as ordinary <img> tags.
+  document.querySelectorAll('img').forEach((image, index) => {
+    if (image.naturalWidth < 100 && image.naturalHeight < 100) return;
+    const candidates = new Set([image.currentSrc, image.src]);
+    for (const source of image.getAttribute('srcset')?.split(',') || []) candidates.add(source.trim().split(/\s+/)[0]);
+    const pinterestImage = (() => { try { return new URL(image.currentSrc || image.src, location.href).hostname.endsWith('pinimg.com'); } catch (_) { return false; } })();
+    for (const candidate of candidates) {
+      if (imageExtensions.test(candidate || '') || pinterestImage) {
+        const size = image.naturalWidth && image.naturalHeight ? ` · ${image.naturalWidth}×${image.naturalHeight}` : '';
+        add(candidate, `Изображение ${index + 1}${size}`, image.getAttribute('type') || 'image', 'Изображение');
+      }
+    }
   });
   return [...found.values()];
 }
@@ -54,7 +70,7 @@ function makeItem(item) {
   top.className = 'top';
   const label = document.createElement('div');
   label.className = 'kind';
-  label.textContent = item.label;
+  label.textContent = `${item.category}: ${item.label}`;
   const button = document.createElement('button');
   button.className = 'download';
   button.textContent = 'Скачать';
