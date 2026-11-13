@@ -6,7 +6,7 @@ It does not extract segmented or protected playback streams, DRM media, blob URL
 
 ## Install
 
-1. Open `vivaldi://extensions`.
+1. Open `://extensions`.
 2. Enable **Developer mode**.
 3. Choose **Load unpacked** and select the `media-link-downloader` folder.
 4. Open a page with direct media links, click the extension icon, then **Найти медиа**.
