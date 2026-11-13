@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Media Grabber",
-  "version": "1.0.0",
-  "description": "Find and download direct media files exposed by the current page.",
+  "name": "__MSG_appName__",
+  "version": "1.2.0",
+  "default_locale": "en",
+  "description": "__MSG_description__",
   "permissions": ["activeTab", "scripting", "downloads"],
   "action": {
     "default_title": "Media Grabber",
