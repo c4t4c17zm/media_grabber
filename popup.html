@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Media Grabber</title>
+  <style>
+    :root { color-scheme: light dark; font: 14px/1.4 system-ui, sans-serif; }
+    body { width: 360px; max-height: 560px; overflow: auto; margin: 0; padding: 16px; background: Canvas; color: CanvasText; }
+    h1 { font-size: 18px; margin: 0; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    button { font: inherit; cursor:pointer; }
+    #scan { border:0; border-radius:8px; padding:7px 10px; background:#d43b36; color:white; }
+    #status { margin:12px 0; color: color-mix(in srgb, CanvasText 70%, transparent); }
+    .item { border-top:1px solid color-mix(in srgb, CanvasText 16%, transparent); padding:11px 0; }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .kind { font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .download { border:1px solid color-mix(in srgb, CanvasText 25%, transparent); border-radius:7px; padding:5px 9px; background:transparent; color:CanvasText; flex:none; }
+    .detail { font-size:12px; opacity:.72; overflow-wrap:anywhere; margin-top:4px; }
+    .empty { padding:16px 0; opacity:.72; }
+    footer { margin-top:12px; padding-top:10px; border-top:1px solid color-mix(in srgb, CanvasText 16%, transparent); font-size:11px; opacity:.65; }
+  </style>
+</head>
+<body>
+  <header><h1>Media Grabber</h1><button id="scan">Найти медиа</button></header>
+  <div id="status" role="status">Нажми «Найти медиа» на открытой странице.</div>
+  <section id="list"></section>
+  <footer>Показывает прямые файлы, доступные странице. Не извлекает защищённые потоки и DRM.</footer>
+  <script src="popup.js"></script>
+</body>
+</html>

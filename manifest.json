@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Media Grabber",
+  "version": "1.0.0",
+  "description": "Find and download direct media files exposed by the current page.",
+  "permissions": ["activeTab", "scripting", "downloads"],
+  "action": {
+    "default_title": "Media Grabber",
+    "default_popup": "popup.html"
+  }
+}
